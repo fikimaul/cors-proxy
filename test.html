@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORS Proxy Tester</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 600px; margin: 0 auto; }
+    input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+    button { padding: 10px 20px; cursor: pointer; margin-right: 10px; }
+    pre { background: #f0f0f0; padding: 10px; border-radius: 5px; overflow-x: auto; max-height: 400px; }
+  </style>
+</head>
+<body>
+  <h1>CORS Proxy Tester</h1>
+  
+  <label>Target URL:</label>
+  <input type="text" id="url" value="https://jsonplaceholder.typicode.com/posts/1" placeholder="Enter target URL">
+  
+  <button onclick="testProxy('GET')">GET</button>
+  <button onclick="testProxy('POST')">POST</button>
+  
+  <h3>Response:</h3>
+  <pre id="response">Waiting for response...</pre>
+
+  <script>
+    function testProxy(method = 'GET') {
+      const targetUrl = document.getElementById('url').value;
+      const proxyUrl = `http://localhost:3000/api/proxy?url=${encodeURIComponent(targetUrl)}`;
+      
+      document.getElementById('response').textContent = 'Loading...';
+      
+      fetch(proxyUrl, { method })
+        .then(res => res.text())
+        .then(data => {
+          try {
+            document.getElementById('response').textContent = JSON.stringify(JSON.parse(data), null, 2);
+          } catch {
+            document.getElementById('response').textContent = data;
+          }
+        })
+        .catch(err => {
+          document.getElementById('response').textContent = `Error: ${err.message}`;
+        });
+    }
+  </script>
+</body>
+</html>
