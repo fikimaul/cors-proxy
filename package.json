@@ -4,12 +4,15 @@
   "description": "CORS Proxy Server",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "vercel dev",
+    "dev": "vercel dev"
   },
   "dependencies": {
     "express": "^4.18.2",
     "axios": "^1.4.0",
     "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "vercel": "^latest"
   }
 }

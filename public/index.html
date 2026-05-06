@@ -1,59 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CORS Proxy Tester</title>
-  <style>
-    body { font-family: Arial; padding: 20px; max-width: 600px; margin: 0 auto; }
-    input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
-    button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
-    pre { background: #f0f0f0; padding: 10px; border-radius: 5px; overflow-x: auto; max-height: 400px; }
-    #response { margin-top: 20px; }
-    #response img { max-width: 100%; height: auto; border-radius: 5px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Proxy Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #0070f3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0051cc;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #0070f3;
+            border-radius: 4px;
+        }
+        pre, img {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body>
-  <h1>CORS Proxy Tester</h1>
-  
-  <label>Target URL:</label>
-  <input type="text" id="url" value="https://jsonplaceholder.typicode.com/posts/1" placeholder="Enter target URL">
-  
-  <button onclick="testProxy()">Test Proxy</button>
-  
-  <h3>Response:</h3>
-  <div id="response">Waiting for response...</div>
+    <div class="container">
+        <h1>🌐 CORS Proxy Tester</h1>
+        
+        <div class="form-group">
+            <label for="url">Enter URL to proxy:</label>
+            <input 
+                type="text" 
+                id="url" 
+                placeholder="https://example.com/api/data"
+            >
+        </div>
+        
+        <button onclick="testProxy()">Test Proxy</button>
+        
+        <h3>Response:</h3>
+        <div id="response">Waiting for response...</div>
+    </div>
 
-  <script>
-    async function testProxy() {
-      const targetUrl = document.getElementById('url').value;
-      const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(targetUrl)}`;
-      
-      document.getElementById('response').innerHTML = 'Loading...';
-      
-      try {
-        const res = await fetch(proxyUrl);
-        const contentType = res.headers.get('content-type') || '';
-        
-        let html;
-        
-        if (contentType.includes('image/')) {
-          const blob = await res.blob();
-          const imageUrl = URL.createObjectURL(blob);
-          html = `<img src="${imageUrl}" alt="Response Image">`;
-        } else if (contentType.includes('application/json')) {
-          const data = await res.json();
-          html = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-        } else {
-          const data = await res.text();
-          html = `<pre>${data}</pre>`;
+    <script>
+        async function testProxy() {
+            const targetUrl = document.getElementById('url').value;
+            const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(targetUrl)}`;
+            
+            document.getElementById('response').innerHTML = 'Loading...';
+            
+            try {
+                const res = await fetch(proxyUrl);
+                const contentType = res.headers.get('content-type') || '';
+                
+                let html;
+                
+                if (contentType.includes('image/')) {
+                    const blob = await res.blob();
+                    const imageUrl = URL.createObjectURL(blob);
+                    html = `<img src="${imageUrl}" alt="Response Image">`;
+                } else if (contentType.includes('application/json')) {
+                    const data = await res.json();
+                    html = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    const data = await res.text();
+                    html = `<pre>${data}</pre>`;
+                }
+                
+                document.getElementById('response').innerHTML = html;
+            } catch (err) {
+                document.getElementById('response').innerHTML = `<pre>Error: ${err.message}</pre>`;
+            }
         }
-        
-        document.getElementById('response').innerHTML = html;
-      } catch (err) {
-        document.getElementById('response').innerHTML = `<pre>Error: ${err.message}</pre>`;
-      }
-    }
-  </script>
+    </script>
 </body>
 </html>
