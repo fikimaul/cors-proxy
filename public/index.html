@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORS Proxy Tester</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 600px; margin: 0 auto; }
+    input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+    button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+    pre { background: #f0f0f0; padding: 10px; border-radius: 5px; overflow-x: auto; max-height: 400px; }
+    #response { margin-top: 20px; }
+    #response img { max-width: 100%; height: auto; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>CORS Proxy Tester</h1>
+  
+  <label>Target URL:</label>
+  <input type="text" id="url" value="https://jsonplaceholder.typicode.com/posts/1" placeholder="Enter target URL">
+  
+  <button onclick="testProxy()">Test Proxy</button>
+  
+  <h3>Response:</h3>
+  <div id="response">Waiting for response...</div>
+
+  <script>
+    async function testProxy() {
+      const targetUrl = document.getElementById('url').value;
+      const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(targetUrl)}`;
+      
+      document.getElementById('response').innerHTML = 'Loading...';
+      
+      try {
+        const res = await fetch(proxyUrl);
+        const contentType = res.headers.get('content-type') || '';
+        
+        let html;
+        
+        if (contentType.includes('image/')) {
+          const blob = await res.blob();
+          const imageUrl = URL.createObjectURL(blob);
+          html = `<img src="${imageUrl}" alt="Response Image">`;
+        } else if (contentType.includes('application/json')) {
+          const data = await res.json();
+          html = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } else {
+          const data = await res.text();
+          html = `<pre>${data}</pre>`;
+        }
+        
+        document.getElementById('response').innerHTML = html;
+      } catch (err) {
+        document.getElementById('response').innerHTML = `<pre>Error: ${err.message}</pre>`;
+      }
+    }
+  </script>
+</body>
+</html>
