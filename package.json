@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "CORS Proxy Server",
   "scripts": {
-    "dev": "node api/index.js"
+    "dev": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",

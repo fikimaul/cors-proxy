@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/proxy",
-      "destination": "/api"
+      "destination": "/index.js"
     }
   ]
 }
