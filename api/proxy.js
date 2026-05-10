@@ -6,16 +6,11 @@ const app = express();
 
 app.use(cors());
 
-// We don't need express.static('public') here because Vercel 
-// serves the public folder automatically at the root.
-
+// The proxy handler logic
 app.get(['/proxy', '/api/proxy'], async (req, res) => {
     const { url } = req.query;
 
     if (!url) {
-        // If no URL is provided, and we are at root, the user might be 
-        // seeing this because the static index.html didn't load.
-        // But normally Vercel serves the static file first.
         return res.status(400).json({
             error: 'URL is required. Usage: /proxy?url=https://example.com'
         });
@@ -33,15 +28,12 @@ app.get(['/proxy', '/api/proxy'], async (req, res) => {
             timeout: 10000 // 10s timeout
         });
 
-        // Pass through the content type
         const contentType = response.headers['content-type'];
         if (contentType) {
             res.setHeader('Content-Type', contentType);
         }
 
-        // Add some basic CORS headers just in case
         res.setHeader('Access-Control-Allow-Origin', '*');
-        
         res.send(response.data);
 
     } catch (error) {
@@ -53,5 +45,4 @@ app.get(['/proxy', '/api/proxy'], async (req, res) => {
     }
 });
 
-// Export the app for Vercel
 module.exports = app;

@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const app = require('./index');
+const app = require('./api/proxy');
 
 // Serve static files from the 'public' directory
 // This handles serving index.html at the root path '/'
