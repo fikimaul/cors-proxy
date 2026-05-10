@@ -4,6 +4,10 @@
     {
       "source": "/proxy",
       "destination": "/index.js"
+    },
+    {
+      "source": "/api/proxy",
+      "destination": "/index.js"
     }
   ]
 }

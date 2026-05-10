@@ -5,49 +5,53 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors());
-app.use(express.json());
-app.use(express.static('public')); // Serve static files locally
 
-app.get('*', async (req, res) => {
+// We don't need express.static('public') here because Vercel 
+// serves the public folder automatically at the root.
+
+app.get(['/proxy', '/api/proxy'], async (req, res) => {
     const { url } = req.query;
 
     if (!url) {
+        // If no URL is provided, and we are at root, the user might be 
+        // seeing this because the static index.html didn't load.
+        // But normally Vercel serves the static file first.
         return res.status(400).json({
-            error: 'URL is required'
+            error: 'URL is required. Usage: /proxy?url=https://example.com'
         });
     }
 
     try {
-        const response = await axios.get(
-            decodeURIComponent(url),
-            {
-                responseType: 'arraybuffer',
-                headers: {
-                    'User-Agent': 'Mozilla/5.0'
-                }
-            }
-        );
+        const targetUrl = decodeURIComponent(url);
+        
+        const response = await axios.get(targetUrl, {
+            responseType: 'arraybuffer',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+                'Accept': '*/*'
+            },
+            timeout: 10000 // 10s timeout
+        });
 
-        res.set(
-            'Content-Type',
-            response.headers['content-type']
-        );
+        // Pass through the content type
+        const contentType = response.headers['content-type'];
+        if (contentType) {
+            res.setHeader('Content-Type', contentType);
+        }
 
+        // Add some basic CORS headers just in case
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        
         res.send(response.data);
 
     } catch (error) {
-        res.status(500).json({
-            error: error.message
+        console.error('Proxy error:', error.message);
+        res.status(error.response?.status || 500).json({
+            error: error.message,
+            details: error.response?.data?.toString() || 'No additional details'
         });
     }
 });
 
+// Export the app for Vercel
 module.exports = app;
-
-// Add local listener for direct execution
-if (require.main === module) {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`\x1b[32m[Proxy]\x1b[0m Server running at http://localhost:${PORT}`);
-    });
-}
