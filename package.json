@@ -2,10 +2,8 @@
   "name": "cors-proxy",
   "version": "1.0.0",
   "description": "CORS Proxy Server",
-  "main": "server.js",
   "scripts": {
-    "start": "node api/proxy.js",
-    "dev": "node api/proxy.js"
+    "dev": "node api/index.js"
   },
   "dependencies": {
     "express": "^4.18.2",

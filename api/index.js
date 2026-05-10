@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public')); // Serve static files locally
 
-app.get(['/proxy', '/api/proxy'], async (req, res) => {
+app.get('*', async (req, res) => {
     const { url } = req.query;
 
     if (!url) {
