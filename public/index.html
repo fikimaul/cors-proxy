@@ -1,116 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORS Proxy Tester</title>
+    <title>CORS Proxy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f5f5f5;
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: #334155;
+            --accent: #10b981;
         }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+
+        * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        button {
-            background: #0070f3;
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Background decorations */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 400;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: #0f172a;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
             color: white;
-            padding: 10px 20px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 12px;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+
         button:hover {
-            background: #0051cc;
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
         }
-        #response {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-left: 4px solid #0070f3;
-            border-radius: 4px;
+
+        button:active {
+            transform: translateY(0);
         }
-        pre, img {
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            background: transparent;
+            border: 2px solid var(--border);
+        }
+
+        .secondary-btn:hover {
+            background: var(--border);
+            border-color: var(--text-dim);
+            box-shadow: none;
+        }
+
+        .result-container {
+            margin-top: 40px;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .badge-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .response-viewer {
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 24px;
+            max-height: 400px;
+            overflow: auto;
+            border: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .response-viewer pre {
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .response-viewer img {
             max-width: 100%;
-            overflow-x: auto;
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .copy-toast {
+            position: fixed;
+            bottom: 30px;
+            background: var(--accent);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transform: translateY(100px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 600;
+        }
+
+        .copy-toast.show {
+            transform: translateY(0);
+        }
+
+        footer {
+            margin-top: 40px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .is-loading .loader {
+            display: block;
+        }
+
+        .is-loading .btn-text {
+            display: none;
         }
     </style>
 </head>
+
 <body>
+    <div class="bg-glow"></div>
+
     <div class="container">
-        <h1>🌐 CORS Proxy Tester</h1>
-        
-        <div class="form-group">
-            <label for="url">Enter URL to proxy:</label>
-            <input 
-                type="text" 
-                id="url" 
-                placeholder="https://example.com/api/data"
-            >
+        <header>
+            <h1>CORS Proxy Tester</h1>
+            <p class="subtitle">Bypass Cross-Origin restrictions with ease</p>
+        </header>
+
+        <div class="input-group">
+            <label for="url">Target URL</label>
+            <input type="text" id="url" placeholder="https://api.example.com/data" value="https://api.github.com/zen">
         </div>
-        
-        <button onclick="testProxy()">Test Proxy</button>
-        
-        <h3>Response:</h3>
-        <div id="response">Waiting for response...</div>
+
+        <div class="actions">
+            <button id="testBtn" onclick="testProxy()">
+                <div class="loader"></div>
+                <span class="btn-text">Send Request</span>
+            </button>
+            <button class="secondary-btn" onclick="copyProxyUrl()">
+                <span>Copy Proxy URL</span>
+            </button>
+        </div>
+
+        <div id="resultContainer" class="result-container">
+            <div class="result-header">
+                <h3 id="statusTitle">Response</h3>
+                <div id="statusBadge" class="badge">200 OK</div>
+            </div>
+            <div class="response-viewer" id="response">
+                <pre id="responseText"></pre>
+            </div>
+        </div>
     </div>
 
+    <footer>
+        Usage: <code>/proxy?url=YOUR_URL</code>
+    </footer>
+
+    <div id="toast" class="copy-toast">URL Copied to clipboard!</div>
+
     <script>
+        const urlInput = document.getElementById('url');
+        const testBtn = document.getElementById('testBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const responseText = document.getElementById('responseText');
+        const responseDiv = document.getElementById('response');
+        const statusBadge = document.getElementById('statusBadge');
+        const toast = document.getElementById('toast');
+
         async function testProxy() {
-            const targetUrl = document.getElementById('url').value;
-            const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(targetUrl)}`;
-            
-            document.getElementById('response').innerHTML = 'Loading...';
-            
+            const targetUrl = urlInput.value.trim();
+            if (!targetUrl) return;
+
+            // Use relative path for proxy
+            const proxyUrl = `/proxy?url=${encodeURIComponent(targetUrl)}`;
+
+            testBtn.classList.add('is-loading');
+            testBtn.disabled = true;
+            resultContainer.style.display = 'block';
+            responseText.textContent = 'Fetching...';
+
             try {
+                const startTime = performance.now();
                 const res = await fetch(proxyUrl);
+                const duration = (performance.now() - startTime).toFixed(0);
+
+                statusBadge.textContent = `${res.status} ${res.statusText} (${duration}ms)`;
+                statusBadge.className = `badge ${res.ok ? 'badge-success' : 'badge-error'}`;
+
                 const contentType = res.headers.get('content-type') || '';
-                
-                let html;
-                
+
                 if (contentType.includes('image/')) {
                     const blob = await res.blob();
                     const imageUrl = URL.createObjectURL(blob);
-                    html = `<img src="${imageUrl}" alt="Response Image">`;
-                } else if (contentType.includes('application/json')) {
-                    const data = await res.json();
-                    html = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                    responseText.style.display = 'none';
+                    const img = document.createElement('img');
+                    img.src = imageUrl;
+                    // Clear previous images
+                    const existingImg = responseDiv.querySelector('img');
+                    if (existingImg) existingImg.remove();
+                    responseDiv.appendChild(img);
                 } else {
-                    const data = await res.text();
-                    html = `<pre>${data}</pre>`;
+                    responseText.style.display = 'block';
+                    const existingImg = responseDiv.querySelector('img');
+                    if (existingImg) existingImg.remove();
+
+                    const text = await res.text();
+                    try {
+                        // Try format as JSON
+                        const json = JSON.parse(text);
+                        responseText.textContent = JSON.stringify(json, null, 2);
+                    } catch (e) {
+                        responseText.textContent = text;
+                    }
                 }
-                
-                document.getElementById('response').innerHTML = html;
             } catch (err) {
-                document.getElementById('response').innerHTML = `<pre>Error: ${err.message}</pre>`;
+                statusBadge.textContent = 'Error';
+                statusBadge.className = 'badge badge-error';
+                responseText.textContent = `Failed to connect to proxy: ${err.message}`;
+            } finally {
+                testBtn.classList.remove('is-loading');
+                testBtn.disabled = false;
             }
         }
+
+        function copyProxyUrl() {
+            const targetUrl = urlInput.value.trim();
+            if (!targetUrl) return;
+
+            const fullProxyUrl = `${window.location.origin}/proxy?url=${encodeURIComponent(targetUrl)}`;
+            navigator.clipboard.writeText(fullProxyUrl);
+
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Enter key to test
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') testProxy();
+        });
     </script>
 </body>
+
 </html>
