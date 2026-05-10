@@ -1,13 +1,18 @@
 {
   "version": 2,
+  "functions": {
+    "index.js": {
+      "runtime": "vercel-node@latest"
+    }
+  },
   "rewrites": [
     {
       "source": "/proxy",
-      "destination": "/api/proxy"
+      "destination": "/index.js"
     },
     {
       "source": "/api/proxy",
-      "destination": "/api/proxy"
+      "destination": "/index.js"
     }
   ]
 }
